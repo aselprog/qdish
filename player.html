@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <title>SokaNet Player</title>
+
+  <!-- Video.js CSS -->
+  <link href="https://vjs.zencdn.net/8.0.4/video-js.css" rel="stylesheet" />
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #840000;
+      font-family: Arial, sans-serif;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    .player-container {
+      width: 100%;
+      background-color: black;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 0;
+      position: relative;
+    }
+
+    .video-js {
+      width: 100% !important;
+      max-width: 100%;
+      height: auto !important;
+      aspect-ratio: 16 / 9;
+      background-color: black;
+    }
+
+    .watermark {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 120px;
+      opacity: 0.3;
+      z-index: 100;
+      border-radius: 8px;
+      pointer-events: none;
+    }
+
+    .channel-name {
+      background-color: #11004f;
+      padding: 15px;
+      text-align: center;
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    .back-button {
+      background-color: #007bff;
+      color: white;
+      padding: 10px 20px;
+      margin: 20px auto;
+      text-decoration: none;
+      font-weight: bold;
+      border-radius: 6px;
+      text-align: center;
+      width: fit-content;
+      display: block;
+    }
+
+    .back-button:hover {
+      background-color: #0056b3;
+    }
+
+    .vjs-error .vjs-error-display .vjs-modal-dialog-content {
+      font-size: 24px;
+      color: rgb(255, 255, 255);
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- VIDEO PLAYER -->
+  <div class="player-container">
+    <!-- Watermark Logo -->
+    <img src="https://i.ibb.co/KjJ93bkP/white-logo.png" alt="Watermark" class="watermark" />
+
+    <video
+      id="m3u8Player"
+      class="video-js vjs-default-skin"
+      controls
+      autoplay
+      playsinline
+      webkit-playsinline
+      preload="auto"
+      poster="https://i.ibb.co/JWmSmKmG/bbb.png"
+      data-setup="{}">
+      <source id="videoSource" src="" type="application/x-mpegURL">
+      Your browser does not support the video tag.
+    </video>
+  </div>
+
+  <!-- CHANNEL NAME -->
+  <div class="channel-name" id="channelName">Loading...</div>
+
+  <!-- BACK BUTTON -->
+  <a class="back-button" href="index.html">⟵ Back to Home</a>
+
+  <!-- Video.js Script -->
+  <script src="https://vjs.zencdn.net/8.0.4/video.min.js"></script>
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const url = params.get("url");
+    const name = params.get("name");
+
+    const source = document.getElementById("videoSource");
+    const channelName = document.getElementById("channelName");
+
+    if (url && name) {
+      source.src = url;
+      channelName.textContent = decodeURIComponent(name);
+
+      const player = videojs("m3u8Player");
+      player.ready(() => {
+        player.src({ type: "application/x-mpegURL", src: url });
+        player.play().catch((e) => {
+          console.warn("Autoplay failed:", e);
+        });
+
+        player.on('error', function () {
+          const errorDisplay = player.errorDisplay;
+          if (errorDisplay && errorDisplay.contentEl()) {
+            errorDisplay.contentEl().innerHTML = "OFFLINE NOW";
+          }
+        });
+      });
+    } else {
+      channelName.textContent = "Invalid or Missing Channel Info";
+    }
+  </script>
+</body>
+</html>
